@@ -1,12 +1,12 @@
-# Hi, I'm [Your Name] 👋
+# Hi, I'm David Stakys 👋
 
 > [Short tagline that reflects who you are and what you do]
 
-I’m a [your profession] passionate about [your focus areas]. I enjoy building meaningful digital experiences, solving real-world problems, and continuously learning new technologies.
+Soy un analista de sistemas, que quiere digitalizar todo a su camino, los formularios realizados a mano, no va mas, en esta era digital, hay que dejar de talar los arboles
 
 ## About Me
 - 💼 Profession: [e.g. Frontend Developer / Full-Stack Engineer / Data Analyst]
-- 🌍 Based in: [City, Country]
+- 🌍 Based in: Zarate, Buenos Aires
 - 🎯 Focus: [web apps, APIs, automation, AI, cybersecurity, etc.]
 - 🚀 Currently learning: [technology or skill]
 - 💡 Looking for: [collaboration, opportunities, mentorship, etc.]
