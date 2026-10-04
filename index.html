@@ -1,1 +1,183 @@
+<div style="max-width:480px;margin:auto;">
+  <h3>Panel Administrativo</h3>
+
+  <!-- LOGIN -->
+  <input id="pass" type="password" placeholder="Ingrese contraseña" style="width:100%;padding:10px;">
+  <button onclick="login()" style="width:100%;padding:10px;margin-top:10px;">Ingresar</button>
+
+  <div id="admin" style="display:none;margin-top:20px;">
+
+    <!-- ALTA -->
+    <h4>Altas</h4>
+    <input id="dni" placeholder="DNI" style="width:100%;padding:10px;">
+    <input id="apellido" placeholder="Apellido" style="width:100%;padding:10px;margin-top:10px;">
+    <input id="nombre" placeholder="Nombre" style="width:100%;padding:10px;margin-top:10px;">
+    <input id="libro" placeholder="Libro" style="width:100%;padding:10px;margin-top:10px;">
+    <input id="folio" placeholder="Folio" style="width:100%;padding:10px;margin-top:10px;">
+    <textarea id="obs" placeholder="Observaciones" style="width:100%;padding:10px;margin-top:10px;"></textarea>
+    <button onclick="alta()" style="width:100%;padding:10px;margin-top:10px;">Guardar Alta</button>
+
+    <hr>
+
+    <!-- BAJA -->
+    <h4>Bajas</h4>
+    <input id="dni_baja" placeholder="DNI a eliminar" style="width:100%;padding:10px;">
+    <button onclick="baja()" style="width:100%;padding:10px;margin-top:10px;">Eliminar</button>
+
+    <hr>
+
+    <!-- MODIFICACIÓN -->
+    <h4>Modificaciones</h4>
+    <input id="dni_mod" placeholder="DNI a modificar" style="width:100%;padding:10px;" onblur="consultar()">
+
+    <input id="apellido_mod" placeholder="Nuevo Apellido" style="width:100%;padding:10px;margin-top:10px;">
+    <input id="nombre_mod" placeholder="Nuevo Nombre" style="width:100%;padding:10px;margin-top:10px;">
+    <input id="libro_mod" placeholder="Nuevo Libro" style="width:100%;padding:10px;margin-top:10px;">
+    <input id="folio_mod" placeholder="Nuevo Folio" style="width:100%;padding:10px;margin-top:10px;">
+    <textarea id="obs_mod" placeholder="Nuevas Observaciones" style="width:100%;padding:10px;margin-top:10px;"></textarea>
+
+    <button onclick="modificar()" style="width:100%;padding:10px;margin-top:10px;">Guardar Cambios</button>
+
+    <div id="resultado" style="margin-top:20px;"></div>
+  </div>
+</div>
+
+<!-- MENSAJE FLOTANTE -->
+<div id="toast" 
+     style="position:fixed; top:20px; right:20px; 
+            background:#333; color:white; padding:12px 18px; 
+            border-radius:6px; display:none; 
+            box-shadow:0 2px 10px rgba(0,0,0,0.3); 
+            z-index:9999; font-size:15px;">
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbzIE8LnfvPSOTkcqyTT5_Q3N_B9OZfxof0KZg1syqMOSqx3v081baL4qKoKFcj0QRye7g/exec";
+const PASSWORD = "Lasecu7#";
+
+/* ------------------ TOAST ------------------ */
+function mostrarToast(mensaje) {
+  const toast = document.getElementById("toast");
+  toast.innerHTML = mensaje;
+  toast.style.display = "block";
+  setTimeout(() => toast.style.display = "none", 2500);
+}
+
+/* ------------------ ENVIAR POST ------------------ */
+async function enviar(data) {
+  const res = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+  return await res.text();
+}
+
+/* ------------------ LOGIN ------------------ */
+function login() {
+  if (document.getElementById("pass").value === PASSWORD) {
+    document.getElementById("admin").style.display = "block";
+    document.getElementById("dni").focus();
+  } else {
+    alert("Contraseña incorrecta");
+  }
+}
+
+/* ------------------ ALTA ------------------ */
+async function alta() {
+  const data = {
+    accion: "alta",
+    dni: dni.value.trim(),
+    apellido: apellido.value.trim(),
+    nombre: nombre.value.trim(),
+    libro: libro.value.trim(),
+    folio: folio.value.trim(),
+    observaciones: obs.value.trim()
+  };
+
+  const txt = await enviar(data);
+
+  if (txt === "DNI_DUPLICADO") {
+    mostrarToast("El DNI ya existe.");
+  } else if (txt === "ALTA_OK") {
+    mostrarToast("Alta registrada.");
+
+    dni.value = "";
+    apellido.value = "";
+    nombre.value = "";
+    libro.value = "";
+    folio.value = "";
+    obs.value = "";
+
+    dni.focus();
+  } else {
+    mostrarToast("Error: " + txt);
+  }
+}
+
+/* ------------------ BAJA ------------------ */
+async function baja() {
+  if (!confirm("¿Seguro que desea eliminar este DNI?")) return;
+
+  const txt = await enviar({
+    accion: "baja",
+    dni: dni_baja.value.trim()
+  });
+
+  if (txt === "DNI_ELIMINADO") {
+    mostrarToast("DNI eliminado.");
+    dni_baja.value = "";
+  } else {
+    mostrarToast("El DNI no existe.");
+  }
+}
+
+/* ------------------ CONSULTAR PARA MODIFICAR ------------------ */
+async function consultar() {
+  const dniBuscado = dni_mod.value.trim();
+  if (dniBuscado === "") return;
+
+  const txt = await enviar({
+    accion: "consultar",
+    dni: dniBuscado
+  });
+
+  if (txt === "DNI_NO_EXISTE") {
+    mostrarToast("El DNI no existe.");
+    return;
+  }
+
+  const datos = txt.split("|");
+
+  apellido_mod.value = datos[1];
+  nombre_mod.value = datos[2];
+  libro_mod.value = datos[3];
+  folio_mod.value = datos[4];
+  obs_mod.value = datos[5];
+
+  mostrarToast("Datos cargados.");
+}
+/* ------------------ MODIFICAR ------------------ */
+async function modificar() {
+  const data = {
+    accion: "modificar",
+    dni: dni_mod.value.trim(),
+    apellido: apellido_mod.value.trim(),
+    nombre: nombre_mod.value.trim(),
+    libro: libro_mod.value.trim(),
+    folio: folio_mod.value.trim(),
+    observaciones: obs_mod.value.trim()
+  };
+
+  const txt = await enviar(data);
+
+  if (txt === "MODIFICADO_OK") {
+    mostrarToast("Registro actualizado.");
+  } else if (txt === "DNI_NO_EXISTE") {
+    mostrarToast("El DNI no existe.");
+  } else {
+    mostrarToast("Error: " + txt);
+  }
+}
+</script>
 
