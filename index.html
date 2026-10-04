@@ -192,49 +192,6 @@ async function modificar() {
     Nueva consulta
   </button>
 </div>
-
-<script>
-const API = "https://script.google.com/macros/s/AKfycbxOTrtINeayO_lIdKN0PmU_M5qICTeHN2aLEOY9uDt29PaZBVUhEgxpHD8X0PzUlERJQw/exec";
-
-async function consultar() {
-  const valor = buscar.value.trim();
-  if (!valor) {
-    resultado.innerHTML = "<p>Ingrese un DNI o apellido.</p>";
-    return;
-  }
-
-  const res = await fetch(`${API}?valor=${valor}`);
-  const datos = await res.json();
-
-  if (datos.length === 0) {
-    resultado.innerHTML = "<p>DNI no existe.</p>";
-    nuevaBtn.style.display = "block";
-    return;
-  }
-
-  let html = "";
-  datos.forEach(d => {
-    html += `
-      <div style="padding:10px;border:1px solid #ccc;margin-bottom:10px;border-radius:5px;">
-        <strong>DNI:</strong> ${d[0]}<br>
-        <strong>Alumno:</strong> ${d[1]}, ${d[2]}<br>
-        <strong>Libro:</strong> ${d[3]}<br>
-        <strong>Folio:</strong> ${d[4]}<br>
-        <strong>Observaciones:</strong> ${d[5]}
-      </div>
-    `;
-  });
-
-  resultado.innerHTML = html;
-  nuevaBtn.style.display = "block";
-}
-
-function nuevaConsulta() {
-  buscar.value = "";
-  resultado.innerHTML = "";
-  nuevaBtn.style.display = "none";
-}
-</script>
 </script>
 
 
